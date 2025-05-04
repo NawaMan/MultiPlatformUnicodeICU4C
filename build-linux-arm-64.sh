@@ -5,7 +5,7 @@ set -e
 DIST_DIR=${1:-$(pwd)/dist}
 
 PROJECT_DIR=$(pwd)
-BUILD_DIR=$(pwd)/build/build-linux-x86-64
+BUILD_DIR=$(pwd)/build/build-linux-arm-64
 SOURCE_DIR="$BUILD_DIR/icu4c-source"
 TARGET_DIR="$BUILD_DIR/icu4c-target"
 BUILD_LOG=$BUILD_DIR/build.log
@@ -41,7 +41,7 @@ print_section "Prepare ICU source"
 print_status "Source: $SOURCE_DIR"
 
 
-print_section "Build Linux x86 64"
+print_section "Build Linux ARM 64"
 
 export CC=clang
 export CXX=clang++
@@ -74,7 +74,7 @@ println
 
 print_section "Packaging..."
 
-BUILD_ZIP="$DIST_DIR/icu4c-${ICU_VERSION}_linux-x86-64_clang-${CLANG_VERSION}.zip"
+BUILD_ZIP="$DIST_DIR/icu4c-${ICU_VERSION}_linux-arm-64_clang-${CLANG_VERSION}.zip"
 mkdir -p "$DIST_DIR"
 
 cp "$PROJECT_DIR/version.txt"  "$TARGET_DIR"

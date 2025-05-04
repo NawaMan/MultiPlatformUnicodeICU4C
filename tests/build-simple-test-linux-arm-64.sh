@@ -12,7 +12,7 @@ DIST_DIR=${DIST_FILE%/*}
 BUILD_DIR=$(pwd)/build
 
 rm    -Rf "$BUILD_DIR"
-mkdir     "$BUILD_DIR"
+mkdir -p  "$BUILD_DIR"
 
 cp    "$DIST_FILE"              "$BUILD_DIR"/icu4c.zip
 unzip "$BUILD_DIR"/icu4c.zip -d "$BUILD_DIR"
@@ -21,21 +21,22 @@ echo ""
 echo "Compiling..."
 echo "BUILD_DIR: $BUILD_DIR"
 
-clang++ \
+clang++                           \
     -std=c++23                    \
-    -I"$BUILD_DIR"/include        \
-    -L"$BUILD_DIR"/lib            \
+    -stdlib=libstdc++             \
+    -I"$BUILD_DIR/include"        \
+    -L"$BUILD_DIR/lib"            \
     *.cpp                         \
-    "$BUILD_DIR"/lib/libicuuc.a   \
-    "$BUILD_DIR"/lib/libicui18n.a \
-    "$BUILD_DIR"/lib/libicudata.a \
+    "$BUILD_DIR/lib/libicuuc.a"   \
+    "$BUILD_DIR/lib/libicui18n.a" \
+    "$BUILD_DIR/lib/libicudata.a" \
+    "$BUILD_DIR/lib/libicuio.a"   \
+    -lfmt                         \
     -o simple-test
 
 echo ""
-
-echo "Running..."
-./simple-test
+echo "Success!"
 echo ""
 
-echo "Success!"
+echo "Test are ready to run: ./simple-test"
 echo ""

@@ -1,0 +1,170 @@
+  # ARM-64 Build Job
+  build-arm-64:
+    name: Build (Linux ARM-64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set non-interactive frontend
+        run: echo 'DEBIAN_FRONTEND=noninteractive' >> $GITHUB_ENV
+
+      - name: Run on ARM-64
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu22.04
+          run: |
+            # Set environment variables
+            export CLANG_VERSION=20
+
+            # Install dependencies
+            apt-get update
+            apt-get install -y      \
+              autoconf                   \
+              automake                   \
+              build-essential            \
+              cmake                      \
+              curl                       \
+              gnupg                      \
+              libfmt-dev                 \
+              lsb-release                \
+              pkg-config                 \
+              python3                    \
+              software-properties-common \
+              unzip                      \
+              wget                       \
+              zip
+            
+            # Install LLVM/Clang
+            wget https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh || true
+            ./llvm.sh ${CLANG_VERSION}
+            rm llvm.sh
+
+            apt-get update
+            apt-get install -y libc++-20-dev libc++abi-20-dev
+
+            # Create symlinks for clang and LLVM tools to be available without version suffix
+            update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-${CLANG_VERSION}   100
+            update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100
+            update-alternatives --set                      clang   /usr/bin/clang-${CLANG_VERSION}
+            update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
+            ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
+            ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
+            
+            echo "Setup LLVM/Clang"
+            echo "Clang       version: "$(clang   --version)
+            echo "Clang++     version: "$(clang++ --version)
+            echo "LLVM-ar     version: "$(llvm-ar-${CLANG_VERSION}     --version)
+            echo "LLVM-ranlib version: "$(llvm-ranlib-${CLANG_VERSION} --version)
+            
+            echo "Build ICU4C"
+            ./build-linux-arm-64.sh
+            
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: icu4c-linux-arm-64
+          path: dist/icu4c-*_linux-arm-64_*.zip
+          if-no-files-found: error
+          retention-days: 1
+
+  # ARM-64 Build Test Job
+  build-test-arm-64:
+    name: Build Test (Linux ARM-64)
+    needs: build-arm-64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set non-interactive frontend
+        run: echo 'DEBIAN_FRONTEND=noninteractive' >> $GITHUB_ENV
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: icu4c-linux-arm-64
+          path: dist
+
+      - name: Run on ARM-64
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu22.04
+          run: |
+            # Set environment variables
+            export CLANG_VERSION=20
+
+            # Install minimal dependencies for testing
+            apt-get update
+            apt-get install -y           \
+              autoconf                   \
+              automake                   \
+              build-essential            \
+              cmake                      \
+              curl                       \
+              gnupg                      \
+              lsb-release                \
+              pkg-config                 \
+              python3                    \
+              software-properties-common \
+              unzip                      \
+              wget                       \
+              zip                        \
+
+            
+            # Install LLVM/Clang
+            wget https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh || true
+            ./llvm.sh ${CLANG_VERSION}
+            rm llvm.sh
+
+            apt-get update
+            apt-get install -y libc++-${CLANG_VERSION}-dev libc++abi-${CLANG_VERSION}-dev
+
+            # Create symlinks for clang and LLVM tools to be available without version suffix
+            update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-${CLANG_VERSION}   100
+            update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100
+            update-alternatives --set                      clang   /usr/bin/clang-${CLANG_VERSION}
+            update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
+            ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
+            ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
+
+            echo "Setup LLVM/Clang"
+            echo "Clang       version: "$(clang   --version)
+            echo "Clang++     version: "$(clang++ --version)
+            echo "LLVM-ar     version: "$(llvm-ar-${CLANG_VERSION}     --version)
+            echo "LLVM-ranlib version: "$(llvm-ranlib-${CLANG_VERSION} --version)
+
+            mkdir -p tests/build
+            DIST_FILE=$(find dist -name 'icu4c-*_linux-arm-64_*.zip' -type f)
+            unzip -o "$DIST_FILE" -d tests/build
+
+            cd tests
+            ./build-simple-test-linux-arm-64.sh "../$DIST_FILE"
+
+      - name: Upload test artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: icu4c-linux-arm-64-test
+          path: tests/simple-test
+          if-no-files-found: error
+          retention-days: 1
+
+  # ARM-64 Run Test Job
+  run-test-arm-64:
+    name: Run Test (Linux ARM-64)
+    needs: build-test-arm-64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: icu4c-linux-arm-64-test
+
+      - name: Run tests
+        run: |
+          chmod +x simple-test
+          ./simple-test

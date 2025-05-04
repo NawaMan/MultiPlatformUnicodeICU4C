@@ -36,3 +36,7 @@
 dist/
 
 tests/simple/build/
+
+tests/simple-test
+
+tests/build/

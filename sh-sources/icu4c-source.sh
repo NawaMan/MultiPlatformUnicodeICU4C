@@ -31,4 +31,8 @@ extract-icu4c() {
     tar -xzf $ICU4C_FILE --strip-components=1
 
     popd 1> /dev/null
+
+    echo "END: extract-icu4c"
+    pwd
+    ls  -la
 }
