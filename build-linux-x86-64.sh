@@ -79,7 +79,9 @@ zip -r $BUILD_ZIP . >> $BUILD_LOG
 print "File: $BUILD_ZIP"
 
 if [ -f "$BUILD_ZIP" ]; then
-    print "Size: $(du -h $BUILD_ZIP | cut -f1)"
+    print "Size: $(du -h "$BUILD_ZIP" | cut -f1)"
+    chmod 777 "$BUILD_ZIP"
+
     print_status "Build succeeded!"
     println
 else

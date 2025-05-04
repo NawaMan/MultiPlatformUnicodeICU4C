@@ -33,3 +33,6 @@
 
 # Build
 /build
+dist/
+
+tests/simple/build/
