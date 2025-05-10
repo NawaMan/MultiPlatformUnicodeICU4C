@@ -27,7 +27,6 @@
               cmake                      \
               curl                       \
               gnupg                      \
-              libfmt-dev                 \
               lsb-release                \
               pkg-config                 \
               python3                    \
@@ -106,6 +105,7 @@
               cmake                      \
               curl                       \
               gnupg                      \
+              libfmt-dev                 \
               lsb-release                \
               pkg-config                 \
               python3                    \
@@ -164,7 +164,15 @@
         with:
           name: icu4c-linux-arm-64-test
 
-      - name: Run tests
-        run: |
-          chmod +x simple-test
-          ./simple-test
+      - name: Install dependencies
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu22.04
+          run: |
+            # Install minimal dependencies for testing
+            apt-get update
+            apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
+
+            chmod +x simple-test
+            ./simple-test

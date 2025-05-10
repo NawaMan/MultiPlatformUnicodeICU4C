@@ -63,7 +63,7 @@ jobs:
             sudo update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
             sudo ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
             sudo ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
-
+            
             echo "Setup LLVM/Clang"
             echo "Clang       version: "$(clang   --version)
             echo "Clang++     version: "$(clang++ --version)
@@ -109,15 +109,21 @@ jobs:
             # Install minimal dependencies for testing
             sudo apt-get update
             sudo apt-get install -y      \
+                                         \
+                                         \
               build-essential            \
               g++-multilib               \
+                                         \
               gcc-multilib               \
               libfmt-dev                 \
                                          \
                                          \
                                          \
+                                         \
               unzip                      \
               wget
+
+
             
             # Install LLVM/Clang
             wget https://apt.llvm.org/llvm.sh
@@ -174,11 +180,9 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
 
-      - name: Run tests
-        run: |
-          chmod +x simple-test
-          ./simple-test
-
+            chmod +x simple-test
+            ./simple-test
+  
   # ARM-64 Build Job
   build-arm-64:
     name: Build (Linux ARM-64)
@@ -354,8 +358,6 @@ jobs:
             # Install minimal dependencies for testing
             apt-get update
             apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
-            
-            uname -m
+
             chmod +x simple-test
             ./simple-test
-

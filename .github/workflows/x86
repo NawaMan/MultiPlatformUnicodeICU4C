@@ -35,7 +35,6 @@
               software-properties-common \
               unzip                      \
               wget                       \
-              libfmt-dev                 \
               zip
             
             # Install LLVM/Clang
@@ -54,7 +53,7 @@
             sudo update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
             sudo ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
             sudo ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
-
+            
             echo "Setup LLVM/Clang"
             echo "Clang       version: "$(clang   --version)
             echo "Clang++     version: "$(clang++ --version)
@@ -100,15 +99,21 @@
             # Install minimal dependencies for testing
             sudo apt-get update
             sudo apt-get install -y      \
+                                         \
+                                         \
               build-essential            \
               g++-multilib               \
+                                         \
               gcc-multilib               \
               libfmt-dev                 \
                                          \
                                          \
                                          \
+                                         \
               unzip                      \
               wget
+
+
             
             # Install LLVM/Clang
             wget https://apt.llvm.org/llvm.sh
@@ -159,7 +164,11 @@
         with:
           name: icu4c-linux-x86-64-test
 
-      - name: Run tests
+      - name: Install dependencies
         run: |
-          chmod +x simple-test
-          ./simple-test
+            # Install minimal dependencies for testing
+            sudo apt-get update
+            sudo apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
+
+            chmod +x simple-test
+            ./simple-test
