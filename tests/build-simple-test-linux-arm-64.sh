@@ -27,10 +27,12 @@ clang++                           \
     -I"$BUILD_DIR/include"        \
     -L"$BUILD_DIR/lib"            \
     *.cpp                         \
-    "$BUILD_DIR/lib/libicuuc.a"   \
+    -Wl,--start-group             \
     "$BUILD_DIR/lib/libicui18n.a" \
+    "$BUILD_DIR/lib/libicuuc.a"   \
     "$BUILD_DIR/lib/libicudata.a" \
     "$BUILD_DIR/lib/libicuio.a"   \
+    -Wl,--end-group               \
     -lfmt                         \
     -o simple-test
 
