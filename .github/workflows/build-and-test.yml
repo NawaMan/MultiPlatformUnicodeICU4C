@@ -404,7 +404,7 @@ jobs:
 
       - name: Check Clang 20 in build script
         run: |
-          .\build-windows-x86-64.bat
+          .\build-windows-x86-64.ps1
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
