@@ -8,13 +8,13 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Get clang version
-for /f "tokens=2 delims= " %%v in ('clang --version ^| findstr /i "clang version"') do (
-    set "CLANG_VERSION=%%v"
-    goto :check_version
+REM Get clang version line
+for /f "delims=" %%v in ('clang --version ^| findstr /i "clang version"') do (
+    for /f "tokens=3" %%x in ("%%v") do (
+        set "CLANG_VERSION=%%x"
+    )
 )
 
-:check_version
 echo Detected Clang version: %CLANG_VERSION%
 echo %CLANG_VERSION% | findstr /b "20." >nul
 if errorlevel 1 (
@@ -24,9 +24,6 @@ if errorlevel 1 (
 
 echo Clang 20 is available and valid.
 
-REM Your actual build command goes here
-REM Example:
-REM cmake -G "Ninja" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .
-REM ninja
+REM Add your build logic here...
 
 endlocal
