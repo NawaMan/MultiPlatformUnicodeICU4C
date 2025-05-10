@@ -1,11 +1,13 @@
 #!/bin/bash
 
+ARCH=arm
+
 set -e
 
 DIST_DIR=${1:-$(pwd)/dist}
 
 PROJECT_DIR=$(pwd)
-BUILD_DIR=$(pwd)/build/build-linux-arm-64
+BUILD_DIR=$(pwd)/build/build-linux-${ARCH}-64
 SOURCE_DIR="$BUILD_DIR/icu4c-source"
 TARGET_DIR="$BUILD_DIR/icu4c-target"
 BUILD_LOG=$BUILD_DIR/build.log
@@ -41,7 +43,7 @@ print_section "Prepare ICU source"
 print_status "Source: $SOURCE_DIR"
 
 
-print_section "Build Linux ARM 64"
+print_section "Build Linux ${ARCH} 64"
 
 export CC=clang
 export CXX=clang++
@@ -49,16 +51,14 @@ export CXX=clang++
 print_status "Configuring..."
 
 cd $SOURCE_DIR
-CFLAGS="-fPIC"              \
-CXXFLAGS="-fPIC"             \
-./source/runConfigureICU    \
-    Linux                   \
-    --prefix="$TARGET_DIR"  \
-    --enable-static         \
-    --disable-samples       \
-    --disable-shared        \
-    --disable-tests         \
-    --disable-dyload        \
+CFLAGS="-fPIC"                   \
+CXXFLAGS="-fPIC"                 \
+./source/runConfigureICU         \
+    Linux                        \
+    --prefix="$TARGET_DIR"       \
+    --enable-static              \
+    --disable-samples            \
+    --disable-tests              \
     --with-data-packaging=static \
     >> $BUILD_LOG
 println
@@ -73,7 +73,7 @@ println
 
 print_section "Packaging..."
 
-BUILD_ZIP="$DIST_DIR/icu4c-${ICU_VERSION}_linux-arm-64_clang-${CLANG_VERSION}.zip"
+BUILD_ZIP="$DIST_DIR/icu4c-${ICU_VERSION}_linux-${ARCH}-64_clang-${CLANG_VERSION}.zip"
 mkdir -p "$DIST_DIR"
 
 cp "$PROJECT_DIR/version.txt"  "$TARGET_DIR"

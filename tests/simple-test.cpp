@@ -84,22 +84,22 @@ void runLocaleExample() {
     // Number formatting
     UErrorCode status = U_ZERO_ERROR;
     std::unique_ptr<icu::NumberFormat> nf_us(icu::NumberFormat::createCurrencyInstance(us, status));
-//     std::unique_ptr<icu::NumberFormat> nf_fr(icu::NumberFormat::createCurrencyInstance(fr, status));
-//     std::unique_ptr<icu::NumberFormat> nf_jp(icu::NumberFormat::createCurrencyInstance(jp, status));
+    std::unique_ptr<icu::NumberFormat> nf_fr(icu::NumberFormat::createCurrencyInstance(fr, status));
+    std::unique_ptr<icu::NumberFormat> nf_jp(icu::NumberFormat::createCurrencyInstance(jp, status));
     
-//     double amount = 1234567.89;
-//     icu::UnicodeString result_us, result_fr, result_jp;
+    double amount = 1234567.89;
+    icu::UnicodeString result_us, result_fr, result_jp;
     
-//     if (U_SUCCESS(status)) {
-//         nf_us->format(amount, result_us);
-//         nf_fr->format(amount, result_fr);
-//         nf_jp->format(amount, result_jp);
+    if (U_SUCCESS(status)) {
+        nf_us->format(amount, result_us);
+        nf_fr->format(amount, result_fr);
+        nf_jp->format(amount, result_jp);
         
-//         std::cout << "Currency formatting:" << std::endl;
-//         std::cout << "  US: " << toString(result_us) << std::endl;
-//         std::cout << "  France: " << toString(result_fr) << std::endl;
-//         std::cout << "  Japan: " << toString(result_jp) << std::endl;
-//     }
+        std::cout << "Currency formatting:" << std::endl;
+        std::cout << "  US: " << toString(result_us) << std::endl;
+        std::cout << "  France: " << toString(result_fr) << std::endl;
+        std::cout << "  Japan: " << toString(result_jp) << std::endl;
+    }
 }
 
 int main() {
