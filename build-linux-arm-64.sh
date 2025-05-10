@@ -55,7 +55,6 @@ CXXFLAGS="-fPIC"             \
     Linux                   \
     --prefix="$TARGET_DIR"  \
     --enable-static         \
-    --disable-extras        \
     --disable-samples       \
     --disable-shared        \
     --disable-tests         \
