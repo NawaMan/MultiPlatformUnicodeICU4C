@@ -15,7 +15,6 @@ for /f "tokens=2 delims= " %%v in ('clang --version ^| findstr /i "clang version
 )
 
 :check_version
-REM Expecting version to start with 20
 echo Detected Clang version: %CLANG_VERSION%
 echo %CLANG_VERSION% | findstr /b "20." >nul
 if errorlevel 1 (
@@ -24,6 +23,10 @@ if errorlevel 1 (
 )
 
 echo Clang 20 is available and valid.
-REM Your build steps go here
+
+REM Your actual build command goes here
+REM Example:
+REM cmake -G "Ninja" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .
+REM ninja
 
 endlocal
