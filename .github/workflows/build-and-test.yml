@@ -401,6 +401,11 @@ jobs:
         run: |
           clang --version
           clang++ --version
+      
+      - name: Prepare ICU source (Windows)
+        shell: pwsh
+        run: |
+          .\prepare-icu4c-source.ps1
 
       - name: Check Clang 20 in build script
         run: |
