@@ -23,18 +23,12 @@ if (Test-Path $SourceDir) {
 }
 New-Item -ItemType Directory -Path $SourceDir | Out-Null
 
-# 1st stage: extract .tgz -> .tar
+# 1st: extract .tgz → .tar
 & 7z e $SourceTar -o"$BuildDir" -y
-# 2nd stage: extract .tar -> actual files
-$tarPath = "$BuildDir\icu4c-source.tar"
-& 7z x $tarPath -o"$SourceDir" -y
-Remove-Item $tarPath
+$tarFile = "$BuildDir\icu4c-source.tar"
 
-# Strip one folder level if needed (similar to --strip-components=1)
-$innerFolder = Get-ChildItem "$SourceDir" | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-if ($innerFolder) {
-    Move-Item "$innerFolder\*" "$SourceDir"
-    Remove-Item "$innerFolder" -Recurse
-}
+# 2nd: extract .tar into $SourceDir
+& 7z x $tarFile -o"$SourceDir" -y
+Remove-Item $tarFile
 
-Write-Output "✅ ICU source prepared at $SourceDir"
+Write-Output "✅ Extracted ICU to $SourceDir"
