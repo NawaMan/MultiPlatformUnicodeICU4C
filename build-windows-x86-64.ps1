@@ -41,6 +41,7 @@ if (Test-Path -Path $versionsPath) {
         }
     }
 }
+Write-Status "Clang version: $ACTUAL_CLANG_VERSION"
 
 # Define logging functions
 function Write-Message {

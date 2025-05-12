@@ -59,6 +59,8 @@ CXXFLAGS="-fPIC"                 \
     --enable-static              \
     --disable-samples            \
     --disable-tests              \
+    --disable-dyload             \
+    --disable-shared             \
     --with-data-packaging=static \
     >> $BUILD_LOG
 println
