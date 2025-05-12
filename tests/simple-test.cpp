@@ -3,10 +3,14 @@
 #include <sstream>
 // #include <format>
 
+// Platform-specific include for console functionality
+#ifdef _WIN32
+#include "console_windows.hpp"  // Windows version without fmt dependency
+#else
+#include "console.hpp"         // Linux version with fmt library
+#endif
 
-#include "console.hpp"
 #define println console::println
-
 
 // For ICU functionality
 #include <unicode/uversion.h>
