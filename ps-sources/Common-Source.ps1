@@ -1,4 +1,4 @@
-# SOURCE ME - DO NOT RUN (Use dot-sourcing: . .\common-source.ps1)
+# SOURCE ME - DO NOT RUN (Use dot-sourcing: . .\Common-Source.ps1)
 
 # Check if BUILD_LOG is set
 if (-not $BUILD_LOG) {
