@@ -61,16 +61,6 @@ try {
     winget install -e --id Ninja.Ninja --accept-source-agreements --accept-package-agreements
 }
 
-Write-Section "Checking for MSBuild"
-
-$msbuild = Get-Command msbuild.exe -ErrorAction SilentlyContinue
-if (-not $msbuild) {
-    Write-Host "MSBuild not found. Installing Visual Studio Build Tools..."
-    winget install -e --id Microsoft.VisualStudio.2022.BuildTools --accept-source-agreements --accept-package-agreements
-} else {
-    Write-Host "MSBuild found: $($msbuild.Source)"
-}
-
 $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
 & "$vsInstallPath\VC\Auxiliary\Build\vcvarsall.bat" amd64_arm64 > $null
 

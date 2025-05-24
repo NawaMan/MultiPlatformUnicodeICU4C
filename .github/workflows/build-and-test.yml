@@ -221,6 +221,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
+
+      - name: Install VS Build Tools
+        shell: pwsh
+        run: |
+          choco install visualstudio2022buildtools --yes
+          choco install visualstudio2022-workload-vctools --yes
         
       - name: Install LLVM and Clang
         shell: pwsh
