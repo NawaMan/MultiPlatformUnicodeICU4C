@@ -210,7 +210,7 @@ jobs:
             
             
   # Windows x86-64 Build Job
-  build-windows-x86-64:
+  build-library-windows-x86-64:
     name: Build (Windows x86-64)
     runs-on: windows-latest
     steps:
@@ -223,26 +223,14 @@ jobs:
           dotnet-version: '8.0.x'
         
       - name: Install LLVM and Clang
-        run: |
-          # Install LLVM and Clang using Chocolatey
-          choco install llvm -y
-          
-          # Add LLVM to PATH
-          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          
-          # Display versions
-          Write-Host "Clang version: $(clang --version)"
-          Write-Host "Clang++ version: $(clang++ --version)"
         shell: pwsh
-      
-      - name: Build ICU4C for Windows
         run: |
-          # Set environment variables
-          $env:CLANG_VERSION = "20"
-          
-          # Build ICU4C using PowerShell script
-          .\build-windows-x86-64.ps1
-        shell: pwsh
+          # Create build directories
+          New-Item -ItemType Directory -Path build -Force | Out-Null
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          .\Ensure-WindowsBuildEnvironment.ps1
+
+          .\Build-Windows-x86-64.ps1
       
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -255,16 +243,11 @@ jobs:
   # Windows x86-64 Build Test Job
   build-test-windows-x86-64:
     name: Build Test (Windows x86-64)
-    needs: build-windows-x86-64
+    needs: build-library-windows-x86-64
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Setup PowerShell Core
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
 
       - name: Download build artifact
         uses: actions/download-artifact@v4
@@ -272,39 +255,24 @@ jobs:
           name: icu4c-windows-x86-64
           path: dist
 
-      - name: Install LLVM and Clang
+      - name: Enable UTF-8 and allow script execution
         run: |
-          # Install LLVM and Clang using Chocolatey
-          choco install llvm -y
-          
-          # Add LLVM to PATH
-          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          
-          # Display versions
-          Write-Host "Clang version: $(clang --version)"
-          Write-Host "Clang++ version: $(clang++ --version)"
-        shell: pwsh
+          chcp 65001
+          Set-ExecutionPolicy Bypass -Scope Process -Force
 
-      - name: Build Test
+      - name: Build test executable
+        shell: pwsh
         run: |
-          # Set environment variables
-          $env:CLANG_VERSION = "20"
-          
-          # Find the distribution file
-          $DIST_FILE = Get-ChildItem -Path dist -Filter "icu4c-*_windows-x86-64_*.zip" -File | Select-Object -First 1 -ExpandProperty FullName
-          
-          # Build the test
           cd tests
-          .\build-simple-test-windows-x86-64.ps1 "..\$DIST_FILE"
-        shell: pwsh
+          $distFile = Get-ChildItem -Path "../dist" -Filter "icu4c-*_windows-x86-64_*.zip" -Recurse | Select-Object -ExpandProperty FullName
+          ./Build-SimpleTest-windows-x86-64.ps1 $distFile
 
-      - name: Upload test artifact
+      - name: Upload test binary
         uses: actions/upload-artifact@v4
         with:
           name: icu4c-windows-x86-64-test
           path: tests/simple-test.exe
-          if-no-files-found: error
-          retention-days: 1
+
 
   # Windows x86-64 Run Test Job
   run-test-windows-x86-64:
@@ -318,7 +286,7 @@ jobs:
           name: icu4c-windows-x86-64-test
 
       - name: Run test
+        shell: pwsh
         run: |
           # Run the test executable
           .\simple-test.exe
-        shell: pwsh
