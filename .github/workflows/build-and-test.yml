@@ -28,7 +28,7 @@ jobs:
           echo "Ensure build environment ..."
           sudo ./ensure-linux-x86-build-environment.sh
           
-          echo "Build ICU4C"
+          echo "Build ..."
           ./build-linux-x86-64.sh
             
       - name: Upload build artifact
@@ -59,14 +59,18 @@ jobs:
 
       - name: Run on x86-64
         run: |
+          pushd tests
+
           chmod +x *.sh
-          mkdir -p tests/build
+          mkdir -p build
           
           echo "Ensure build environment ..."
           sudo ./ensure-linux-x86-build-test-environment.sh
 
           echo "Build simple test ..."
           ./build-simple-test-linux-x86-64.sh "../dist/icu4c-*_linux-x86-64_*.zip"
+          
+          popd
 
       - name: Upload test artifact
         uses: actions/upload-artifact@v4
