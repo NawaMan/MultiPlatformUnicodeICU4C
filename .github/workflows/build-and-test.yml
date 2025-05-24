@@ -9,7 +9,7 @@ on:
 
 jobs:
   # x86-64 Build Job
-  build-x86-64:
+  build-library-linux-x86-64:
     name: Build (Linux x86-64)
     runs-on: ubuntu-latest
     steps:
@@ -21,57 +21,15 @@ jobs:
 
       - name: Run on x86-64
         run: |
+          chmod +x *.sh
+          mkdir -p build
+          mkdir -p dist
 
-
-
-
-            # Set environment variables
-            export CLANG_VERSION=20
-
-            # Install dependencies
-            sudo apt-get update
-            sudo apt-get install -y      \
-              autoconf                   \
-              automake                   \
-              build-essential            \
-              cmake                      \
-              curl                       \
-              g++-multilib               \
-              gcc-multilib               \
-              gnupg                      \
-              lsb-release                \
-              pkg-config                 \
-              python3                    \
-              software-properties-common \
-              unzip                      \
-              wget                       \
-              zip
-            
-            # Install LLVM/Clang
-            wget https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh || true
-            sudo ./llvm.sh ${CLANG_VERSION}
-            rm llvm.sh
-
-
-
-
-            # Create symlinks for clang and LLVM tools to be available without version suffix
-            sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-${CLANG_VERSION}   100
-            sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100
-            sudo update-alternatives --set                      clang   /usr/bin/clang-${CLANG_VERSION}
-            sudo update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
-            sudo ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
-            sudo ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
-            
-            echo "Setup LLVM/Clang"
-            echo "Clang       version: "$(clang   --version)
-            echo "Clang++     version: "$(clang++ --version)
-            echo "LLVM-ar     version: "$(llvm-ar-${CLANG_VERSION}     --version)
-            echo "LLVM-ranlib version: "$(llvm-ranlib-${CLANG_VERSION} --version)
-            
-            echo "Build ICU4C"
-            ./build-linux-x86-64.sh
+          echo "Ensure build environment ..."
+          sudo ./ensure-linux-x86-build-environment.sh
+          
+          echo "Build ICU4C"
+          ./build-linux-x86-64.sh
             
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -84,7 +42,7 @@ jobs:
   # x86-64 Build Test Job
   build-test-x86-64:
     name: Build Test (Linux x86-64)
-    needs: build-x86-64
+    needs: build-library-linux-x86-64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -101,59 +59,14 @@ jobs:
 
       - name: Run on x86-64
         run: |
+          chmod +x *.sh
+          mkdir -p tests/build
+          
+          echo "Ensure build environment ..."
+          sudo ./ensure-linux-x86-build-test-environment.sh
 
-
-            # Set environment variables
-            export CLANG_VERSION=20
-
-            # Install minimal dependencies for testing
-            sudo apt-get update
-            sudo apt-get install -y      \
-                                         \
-                                         \
-              build-essential            \
-              g++-multilib               \
-                                         \
-              gcc-multilib               \
-              libfmt-dev                 \
-                                         \
-                                         \
-                                         \
-                                         \
-              unzip                      \
-              wget
-
-
-            
-            # Install LLVM/Clang
-            wget https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh || true
-            sudo ./llvm.sh ${CLANG_VERSION}
-            rm llvm.sh
-
-
-
-
-            # Create symlinks for clang and LLVM tools to be available without version suffix
-            sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-${CLANG_VERSION}   100
-            sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100
-            sudo update-alternatives --set                      clang   /usr/bin/clang-${CLANG_VERSION}
-            sudo update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
-            sudo ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
-            sudo ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
-
-            echo "Setup LLVM/Clang"
-            echo "Clang       version: "$(clang   --version)
-            echo "Clang++     version: "$(clang++ --version)
-            echo "LLVM-ar     version: "$(llvm-ar-${CLANG_VERSION}     --version)
-            echo "LLVM-ranlib version: "$(llvm-ranlib-${CLANG_VERSION} --version)
-
-            mkdir -p tests/build
-            DIST_FILE=$(find dist -name 'icu4c-*_linux-x86-64_*.zip' -type f)
-            unzip -o "$DIST_FILE" -d tests/build
-
-            cd tests
-            ./build-simple-test-linux-x86-64.sh "../$DIST_FILE"
+          echo "Build simple test ..."
+          ./build-simple-test-linux-x86-64.sh "../dist/icu4c-*_linux-x86-64_*.zip"
 
       - name: Upload test artifact
         uses: actions/upload-artifact@v4
@@ -253,8 +166,6 @@ jobs:
           path: dist/icu4c-*_linux-arm-64_*.zip
           if-no-files-found: error
           retention-days: 1
-
-
 
   # ARM-64 Build Test Job
   build-test-arm-64:

@@ -1,9 +1,12 @@
 # SOURCE ME - DO NOT RUN
 
-
 if [[ "$BUILD_LOG" == "" ]]; then
   echo "BUILD_LOG is not set!"
-  exit 1
+  
+  mkdir -p build
+  touch build/build.log
+  export BUILD_LOG="build/build.log"
+  echo "Build log: $BUILD_LOG"
 fi
 
 
