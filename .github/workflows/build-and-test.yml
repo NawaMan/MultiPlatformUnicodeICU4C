@@ -222,18 +222,35 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install VS Build Tools
+      - name: Install VS Build Tools and C++ Workload
         shell: pwsh
         run: |
           choco install visualstudio2022buildtools --yes
-          choco install visualstudio2022-workload-vctools --yes
+          $exitCode1 = $LASTEXITCODE
+          if ($exitCode1 -eq 3010) {
+            Write-Host "VS Build Tools installed successfully, reboot required (3010)."
+          } elseif ($exitCode1 -ne 0) {
+            throw "VS Build Tools installation failed with exit code $exitCode1."
+          }
         
+          choco install visualstudio2022-workload-vctools --yes
+          $exitCode2 = $LASTEXITCODE
+          if ($exitCode2 -eq 3010) {
+            Write-Host "VC++ Workload installed successfully, reboot required (3010)."
+          } elseif ($exitCode2 -ne 0) {
+            throw "VC++ Workload installation failed with exit code $exitCode2."
+          }
+        
+          # ✅ Prevent GitHub Actions from misinterpreting the exit code
+          exit 0
+        
+
       - name: Install LLVM and Clang
         shell: pwsh
         run: |
           # Create build directories
           New-Item -ItemType Directory -Path build -Force | Out-Null
-          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          New-Item -ItemType Directory -Path dist  -Force | Out-Null
           .\Ensure-WindowsBuildEnvironment.ps1
 
           .\Build-Windows-x86-64.ps1
