@@ -26,7 +26,7 @@ jobs:
           mkdir -p dist
 
           echo "Ensure build environment ..."
-          sudo ./ensure-linux-x86-build-environment.sh
+          sudo ./ensure-linux-x86-64-build-environment.sh
           
           echo "Build ..."
           ./build-linux-x86-64.sh
@@ -65,7 +65,7 @@ jobs:
           mkdir -p build
           
           echo "Ensure build environment ..."
-          sudo ./ensure-linux-x86-build-test-environment.sh
+          sudo ./ensure-linux-x86-64-build-test-environment.sh
 
           echo "Build simple test ..."
           DIST_FILE=$(find ../dist -name 'icu4c-*_linux-x86-64_*.zip' -type f)
@@ -95,8 +95,8 @@ jobs:
       - name: Install dependencies
         run: |
             # Install minimal dependencies for testing
-            sudo apt-get update
-            sudo apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
+            # sudo apt-get update
+            # sudo apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
 
             chmod +x simple-test
             ./simple-test
@@ -118,51 +118,16 @@ jobs:
           arch: aarch64
           distro: ubuntu22.04
           run: |
-            # Set environment variables
-            export CLANG_VERSION=20
+            chmod +x *.sh
+            mkdir -p build
+            mkdir -p dist
 
-            # Install dependencies
-            apt-get update
-            apt-get install -y      \
-              autoconf                   \
-              automake                   \
-              build-essential            \
-              cmake                      \
-              curl                       \
-              gnupg                      \
-              lsb-release                \
-              pkg-config                 \
-              python3                    \
-              software-properties-common \
-              unzip                      \
-              wget                       \
-              zip
+            echo "Ensure build environment ..."
+            sudo ./ensure-linux-arm-64-build-environment.sh
             
-            # Install LLVM/Clang
-            wget https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh || true
-            ./llvm.sh ${CLANG_VERSION}
-            rm llvm.sh
-
-            apt-get update
-            apt-get install -y libc++-20-dev libc++abi-20-dev
-
-            # Create symlinks for clang and LLVM tools to be available without version suffix
-            update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-${CLANG_VERSION}   100
-            update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100
-            update-alternatives --set                      clang   /usr/bin/clang-${CLANG_VERSION}
-            update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
-            ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
-            ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
-            
-            echo "Setup LLVM/Clang"
-            echo "Clang       version: "$(clang   --version)
-            echo "Clang++     version: "$(clang++ --version)
-            echo "LLVM-ar     version: "$(llvm-ar-${CLANG_VERSION}     --version)
-            echo "LLVM-ranlib version: "$(llvm-ranlib-${CLANG_VERSION} --version)
-            
-            echo "Build ICU4C"
+            echo "Build ..."
             ./build-linux-arm-64.sh
+
             
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -196,57 +161,19 @@ jobs:
           arch: aarch64
           distro: ubuntu22.04
           run: |
-            # Set environment variables
-            export CLANG_VERSION=20
+            pushd tests
 
-            # Install minimal dependencies for testing
-            apt-get update
-            apt-get install -y           \
-              autoconf                   \
-              automake                   \
-              build-essential            \
-              cmake                      \
-              curl                       \
-              gnupg                      \
-              libfmt-dev                 \
-              lsb-release                \
-              pkg-config                 \
-              python3                    \
-              software-properties-common \
-              unzip                      \
-              wget                       \
-              zip                        \
-
+            chmod +x *.sh
+            mkdir -p build
             
-            # Install LLVM/Clang
-            wget https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh || true
-            ./llvm.sh ${CLANG_VERSION}
-            rm llvm.sh
+            echo "Ensure build environment ..."
+            sudo ./ensure-linux-arm-64-build-test-environment.sh
 
-            apt-get update
-            apt-get install -y libc++-${CLANG_VERSION}-dev libc++abi-${CLANG_VERSION}-dev
+            echo "Build simple test ..."
+            DIST_FILE=$(find ../dist -name 'icu4c-*_linux-arm-64_*.zip' -type f)
+            ./build-simple-test-linux-arm-64.sh "$DIST_FILE"
 
-            # Create symlinks for clang and LLVM tools to be available without version suffix
-            update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-${CLANG_VERSION}   100
-            update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} 100
-            update-alternatives --set                      clang   /usr/bin/clang-${CLANG_VERSION}
-            update-alternatives --set                      clang++ /usr/bin/clang++-${CLANG_VERSION}
-            ln -sf /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
-            ln -sf /usr/bin/llvm-ranlib-${CLANG_VERSION} /usr/bin/llvm-ranlib
-
-            echo "Setup LLVM/Clang"
-            echo "Clang       version: "$(clang   --version)
-            echo "Clang++     version: "$(clang++ --version)
-            echo "LLVM-ar     version: "$(llvm-ar-${CLANG_VERSION}     --version)
-            echo "LLVM-ranlib version: "$(llvm-ranlib-${CLANG_VERSION} --version)
-
-            mkdir -p tests/build
-            DIST_FILE=$(find dist -name 'icu4c-*_linux-arm-64_*.zip' -type f)
-            unzip -o "$DIST_FILE" -d tests/build
-
-            cd tests
-            ./build-simple-test-linux-arm-64.sh "../$DIST_FILE"
+            popd
 
       - name: Upload test artifact
         uses: actions/upload-artifact@v4
@@ -273,10 +200,10 @@ jobs:
           arch: aarch64
           distro: ubuntu22.04
           run: |
-            # Install minimal dependencies for testing
-            apt-get update
-            apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
-
+            # # Install minimal dependencies for testing
+            # apt-get update
+            # apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
+            # 
             chmod +x simple-test
             ./simple-test
             

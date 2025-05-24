@@ -13,8 +13,8 @@ apt-get install -y             \
     build-essential            \
     cmake                      \
     curl                       \
-    g++-multilib               \
-    gcc-multilib               \
+                               \
+                               \
     gnupg                      \
     lsb-release                \
     pkg-config                 \
@@ -23,7 +23,8 @@ apt-get install -y             \
     unzip                      \
     wget                       \
     zip                        \
-    2>&1 | grep -E 'is already the newest version|Setting up|Preparing to unpack|Installing'
+    2>&1                       \
+    | grep -E 'is already the newest version|Setting up|Preparing to unpack|Installing'
 
 
 ./ensure-linux-llvm-setup.sh
