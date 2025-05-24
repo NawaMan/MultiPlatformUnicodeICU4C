@@ -68,8 +68,9 @@ jobs:
           sudo ./ensure-linux-x86-build-test-environment.sh
 
           echo "Build simple test ..."
-          ./build-simple-test-linux-x86-64.sh "../dist/icu4c-*_linux-x86-64_*.zip"
-          
+          DIST_FILE=$(find ../dist -name 'icu4c-*_linux-x86-64_*.zip' -type f)
+          ./build-simple-test-linux-x86-64.sh "$DIST_FILE"
+
           popd
 
       - name: Upload test artifact
