@@ -1,9 +1,13 @@
 # SOURCE ME - DO NOT RUN (Use dot-sourcing: . .\Common-Source.ps1)
 
 # Check if BUILD_LOG is set
-if (-not $BUILD_LOG) {
-    Write-Error "BUILD_LOG is not set!"
-    exit 1
+if ([string]::IsNullOrEmpty($BUILD_LOG)) {
+  Write-Host "BUILD_LOG is not set!"
+  
+  New-Item -Path "build"           -ItemType Directory -Force | Out-Null
+  New-Item -Path "build/build.log" -ItemType File      -Force | Out-Null
+  $script:BUILD_LOG = "build/build.log"
+  Write-Host "Build log: $BUILD_LOG"
 }
 
 # == PRINTING FUNCTIONS ==
