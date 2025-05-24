@@ -40,7 +40,7 @@ jobs:
           retention-days: 1
 
   # x86-64 Build Test Job
-  build-test-x86-64:
+  build-test-linux-x86-64:
     name: Build Test (Linux x86-64)
     needs: build-library-linux-x86-64
     runs-on: ubuntu-latest
@@ -82,9 +82,9 @@ jobs:
           retention-days: 1
 
   # x86-64 Run Test Job
-  run-test-x86-64:
+  run-test-linux-x86-64:
     name: Run Test (Linux x86-64)
-    needs: build-test-x86-64
+    needs: build-test-linux-x86-64
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifact
@@ -101,8 +101,9 @@ jobs:
             chmod +x simple-test
             ./simple-test
   
+
   # ARM-64 Build Job
-  build-arm-64:
+  build-library-linux-arm-64:
     name: Build (Linux ARM-64)
     runs-on: ubuntu-latest
     steps:
@@ -123,7 +124,7 @@ jobs:
             mkdir -p dist
 
             echo "Ensure build environment ..."
-            sudo ./ensure-linux-arm-64-build-environment.sh
+            ./ensure-linux-arm-64-build-environment.sh
             
             echo "Build ..."
             ./build-linux-arm-64.sh
@@ -138,9 +139,9 @@ jobs:
           retention-days: 1
 
   # ARM-64 Build Test Job
-  build-test-arm-64:
+  build-test-linux-arm-64:
     name: Build Test (Linux ARM-64)
-    needs: build-arm-64
+    needs: build-library-linux-arm-64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -184,9 +185,9 @@ jobs:
           retention-days: 1
 
   # ARM-64 Run Test Job
-  run-test-arm-64:
+  run-test-linux-arm-64:
     name: Run Test (Linux ARM-64)
-    needs: build-test-arm-64
+    needs: build-test-linux-arm-64
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifact
