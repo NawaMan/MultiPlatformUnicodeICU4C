@@ -28,20 +28,6 @@ if (-not (Test-Path -Path $BUILD_LOG)) {
     Clear-Content -Path $BUILD_LOG
 }
 
-# Source version information from versions.env
-$versionsPath = Join-Path (Get-Location) "versions.env"
-if (Test-Path -Path $versionsPath) {
-    # Parse the versions.env file to extract variables
-    $versionContent = Get-Content -Path $versionsPath
-    foreach ($line in $versionContent) {
-        if ($line -match '^\s*([^=\s]+)\s*=\s*(.*)$') {
-            $varName = $matches[1]
-            $varValue = $matches[2].Trim("'").Trim('"')
-            Set-Variable -Name $varName -Value $varValue
-        }
-    }
-}
-Write-Status "Clang version: $ACTUAL_CLANG_VERSION"
 
 # Define logging functions
 function Write-Message {
@@ -76,6 +62,21 @@ function Stop-WithError {
     Add-Content -Path $BUILD_LOG -Value "ERROR: $Text"
     exit 1
 }
+
+# Source version information from versions.env
+$versionsPath = Join-Path (Get-Location) "versions.env"
+if (Test-Path -Path $versionsPath) {
+    # Parse the versions.env file to extract variables
+    $versionContent = Get-Content -Path $versionsPath
+    foreach ($line in $versionContent) {
+        if ($line -match '^\s*([^=\s]+)\s*=\s*(.*)$') {
+            $varName = $matches[1]
+            $varValue = $matches[2].Trim("'").Trim('"')
+            Set-Variable -Name $varName -Value $varValue
+        }
+    }
+}
+Write-Status "Clang version: $ACTUAL_CLANG_VERSION"
 
 # Check compiler versions
 Write-Host "Clang       version: $(clang --version)"

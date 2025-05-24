@@ -95,8 +95,8 @@ jobs:
       - name: Install dependencies
         run: |
             # Install minimal dependencies for testing
-            # sudo apt-get update
-            # sudo apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
+            sudo apt-get update
+            sudo apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
 
             chmod +x simple-test
             ./simple-test
@@ -201,12 +201,13 @@ jobs:
           arch: aarch64
           distro: ubuntu22.04
           run: |
-            # # Install minimal dependencies for testing
-            # apt-get update
-            # apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
-            # 
+            # Install minimal dependencies for testing
+            apt-get update
+            apt-get install -y libfmt-dev    # Do this for now, we should wap this in another project
+
             chmod +x simple-test
             ./simple-test
+            
             
   # Windows x86-64 Build Job
   build-windows-x86-64:
