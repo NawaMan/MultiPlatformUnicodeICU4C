@@ -168,7 +168,7 @@ jobs:
             mkdir -p build
             
             echo "Ensure build environment ..."
-            ../ensure-linux-arm-64-build-test-environment.sh
+            ./ensure-linux-arm-64-build-test-environment.sh
 
             echo "Build simple test ..."
             DIST_FILE=$(find ../dist -name 'icu4c-*_linux-arm-64_*.zip' -type f)
