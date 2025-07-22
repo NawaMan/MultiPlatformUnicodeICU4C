@@ -210,11 +210,26 @@ if (Test-Path -Path "./source/allinone/allinone.sln") {
     Stop-WithError "Cannot find MSVC build files"
 }
 
-# Set up MSVC environment if needed
-$msbuildPath = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
-if (-not (Test-Path -Path $msbuildPath)) {
-    $msbuildPath = "msbuild"  # Try to use msbuild from PATH
+# Locate MSBuild reliably using vswhere
+Write-Status "Locating MSBuild using vswhere..."
+
+$vswherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+if (-not (Test-Path -Path $vswherePath)) {
+    Stop-WithError "vswhere.exe not found at $vswherePath. Please ensure Visual Studio Build Tools are installed."
 }
+
+$vsInstallPath = & "$vswherePath" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+if (-not $vsInstallPath) {
+    Stop-WithError "Visual Studio installation with MSBuild not found."
+}
+
+$msbuildPath = Join-Path $vsInstallPath "MSBuild\Current\Bin\MSBuild.exe"
+if (-not (Test-Path -Path $msbuildPath)) {
+    Stop-WithError "MSBuild.exe not found at $msbuildPath"
+}
+
+Write-Status "Resolved MSBuild path: $msbuildPath"
+
 
 # Get number of processors for parallel build
 $numProcs = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
@@ -309,6 +324,7 @@ if (Test-Path -Path $BUILD_ZIP) {
     
     Write-Status "Build succeeded!"
     Write-EmptyLine
+    exit 0
 } else {
     Write-Status "Build failed!"
     exit 1
