@@ -357,4 +357,6 @@ jobs:
         run: |
           # Run the test executable
           cd tests
-          ./simple-test.exe
+          .\simple-test.exe
+          Write-Host "Process exited with code: $LASTEXITCODE"
+          exit $LASTEXITCODE
