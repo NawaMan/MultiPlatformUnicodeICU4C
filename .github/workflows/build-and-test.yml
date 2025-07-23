@@ -313,6 +313,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: icu4c-windows-x86-64-test
+          path: tests
 
       - name: Show tree
         run: |
@@ -323,4 +324,5 @@ jobs:
         shell: pwsh
         run: |
           # Run the test executable
+          cd tests
           ./simple-test.exe
