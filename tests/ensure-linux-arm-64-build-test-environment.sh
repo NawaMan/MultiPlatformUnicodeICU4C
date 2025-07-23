@@ -14,6 +14,7 @@ apt-get install -y              \
                                 \
                                 \
     libfmt-dev                  \
+    lsb_release                 \
                                 \
                                 \
                                 \
