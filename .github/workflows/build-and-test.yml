@@ -312,6 +312,4 @@ jobs:
         shell: pwsh
         run: |
           # Run the test executable
-          dir
-          dir tests
-          .\simple-test.exe
+          simple-test.exe
