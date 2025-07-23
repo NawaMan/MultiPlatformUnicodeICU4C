@@ -18,6 +18,9 @@ cp    "$DIST_FILE"              "$BUILD_DIR"/icu4c.zip
 unzip "$BUILD_DIR"/icu4c.zip -d "$BUILD_DIR"
 echo ""
 
+tree
+echo ""
+
 echo "Compiling..."
 echo "BUILD_DIR: $BUILD_DIR"
 

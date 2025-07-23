@@ -19,6 +19,7 @@ apt-get install -y              \
                                 \
                                 \
                                 \
+    tree                        \
     unzip                       \
     wget
 

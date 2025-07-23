@@ -24,6 +24,9 @@ Write-Host "Extracting ICU distribution..."
 Copy-Item -Path $DIST_FILE -Destination (Join-Path $BUILD_DIR "icu4c.zip")
 Expand-Archive -Path (Join-Path $BUILD_DIR "icu4c.zip") -DestinationPath $BUILD_DIR
 
+Get-ChildItem -Recurse | Tree
+Write-Output ""
+
 # Find include and lib directories
 $includeDir = Join-Path $BUILD_DIR "include"
 $libDir = Join-Path $BUILD_DIR "lib"
