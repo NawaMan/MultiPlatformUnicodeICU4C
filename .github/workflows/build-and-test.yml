@@ -323,4 +323,4 @@ jobs:
         shell: pwsh
         run: |
           # Run the test executable
-          simple-test.exe
+          ./simple-test.exe
