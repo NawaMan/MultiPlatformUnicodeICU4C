@@ -92,6 +92,9 @@ jobs:
         with:
           name: icu4c-linux-x86-64-test
 
+      - name: Show tree
+        run: tree
+
       - name: Install dependencies
         run: |
             # Install minimal dependencies for testing
@@ -194,6 +197,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: icu4c-linux-arm-64-test
+
+      - name: Show tree
+        run: tree
 
       - name: Install dependencies
         uses: uraimo/run-on-arch-action@v2
@@ -307,6 +313,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: icu4c-windows-x86-64-test
+
+      - name: Show tree
+        run: |
+          Get-ChildItem -Recurse | Tree
+          Write-Output ""
 
       - name: Run test
         shell: pwsh
