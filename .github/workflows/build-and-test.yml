@@ -30,6 +30,9 @@ jobs:
           
           echo "Build ..."
           ./build-linux-x86-64.sh
+
+      - name: Show tree
+        run: tree
             
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -57,6 +60,9 @@ jobs:
           name: icu4c-linux-x86-64
           path: dist
 
+      - name: Show tree
+        run: tree
+
       - name: Run on x86-64
         run: |
           pushd tests
@@ -72,6 +78,9 @@ jobs:
           ./build-simple-test-linux-x86-64.sh "$DIST_FILE"
 
           popd
+
+      - name: Show tree
+        run: tree
 
       - name: Upload test artifact
         uses: actions/upload-artifact@v4
@@ -132,6 +141,8 @@ jobs:
             echo "Build ..."
             ./build-linux-arm-64.sh
 
+      - name: Show tree
+        run: tree
             
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -159,6 +170,9 @@ jobs:
           name: icu4c-linux-arm-64
           path: dist
 
+      - name: Show tree
+        run: tree
+
       - name: Run on ARM-64
         uses: uraimo/run-on-arch-action@v2
         with:
@@ -178,6 +192,9 @@ jobs:
             ./build-simple-test-linux-arm-64.sh "$DIST_FILE"
 
             popd
+
+      - name: Show tree
+        run: tree
 
       - name: Upload test artifact
         uses: actions/upload-artifact@v4
@@ -260,6 +277,11 @@ jobs:
           .\Ensure-WindowsBuildEnvironment.ps1
 
           .\Build-Windows-x86-64.ps1
+
+      - name: Show tree
+        run: |
+          tree /f
+          Write-Output ""
       
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -284,6 +306,11 @@ jobs:
           name: icu4c-windows-x86-64
           path: dist
 
+      - name: Show tree
+        run: |
+          tree /f
+          Write-Output ""
+
       - name: Enable UTF-8 and allow script execution
         run: |
           chcp 65001
@@ -295,6 +322,11 @@ jobs:
           cd tests
           $distFile = Get-ChildItem -Path "../dist" -Filter "icu4c-*_windows-x86-64_*.zip" -Recurse | Select-Object -ExpandProperty FullName
           ./Build-SimpleTest-windows-x86-64.ps1 $distFile
+
+      - name: Show tree
+        run: |
+          tree /f
+          Write-Output ""
 
       - name: Upload test binary
         uses: actions/upload-artifact@v4
@@ -317,7 +349,7 @@ jobs:
 
       - name: Show tree
         run: |
-          Get-ChildItem -Recurse | Tree
+          tree /f
           Write-Output ""
 
       - name: Run test
