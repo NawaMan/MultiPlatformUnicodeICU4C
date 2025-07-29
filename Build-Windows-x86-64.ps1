@@ -230,6 +230,53 @@ if (-not (Test-Path -Path $msbuildPath)) {
 
 Write-Status "Resolved MSBuild path: $msbuildPath"
 
+# === ✅ FIX START: Remove UWP projects and patch for static lib build ===
+
+# Remove UWP project references from the solution
+Write-Status "Removing UWP projects from allinone.sln..."
+$slnPath = "$SOURCE_DIR\source\allinone\allinone.sln"
+(Get-Content $slnPath) | Where-Object { $_ -notmatch '_uwp\.vcxproj' } | Set-Content $slnPath
+
+# Delete UWP project files
+Write-Status "Removing UWP .vcxproj and filter files..."
+Get-ChildItem -Path "$SOURCE_DIR\source" -Recurse -Include "*_uwp.vcxproj", "*_uwp.vcxproj.filters" | ForEach-Object {
+    Write-Host "Removing: $($_.FullName)"
+    Remove-Item $_.FullName -Force
+}
+
+# Patch ICU .vcxproj files to build static libs instead of DLLs
+Write-Status "Patching ICU .vcxproj files for static build..."
+$projFiles = Get-ChildItem -Path "$SOURCE_DIR\source\allinone" -Recurse -Filter *.vcxproj
+foreach ($proj in $projFiles) {
+    (Get-Content $proj.PSPath) -replace 'ConfigurationType>DynamicLibrary', 'ConfigurationType>StaticLibrary' |
+        Set-Content $proj.PSPath
+    (Get-Content $proj.PSPath) -replace 'RuntimeLibrary>MultiThreadedDLL', 'RuntimeLibrary>MultiThreaded' |
+        Set-Content $proj.PSPath
+    (Get-Content $proj.PSPath) -replace 'U_ICU_IMPLEMENTATION', 'U_STATIC_IMPLEMENTATION' |
+        Set-Content $proj.PSPath
+}
+
+
+# Remove UWP project files to prevent build failure and DLL output
+Write-Status "Removing UWP projects to avoid toolset errors and DLLs..."
+Get-ChildItem -Path "$SOURCE_DIR\source" -Recurse -Include "*_uwp.vcxproj", "*_uwp.vcxproj.filters" |
+    ForEach-Object {
+        Write-Host "Removing: $($_.FullName)"
+        Remove-Item $_.FullName -Force
+    }
+
+
+# Patch ICU projects for static build
+$projFiles = Get-ChildItem -Path source/allinone -Recurse -Filter *.vcxproj
+foreach ($proj in $projFiles) {
+    (Get-Content $proj.PSPath) -replace 'ConfigurationType>DynamicLibrary', 'ConfigurationType>StaticLibrary' |
+    Set-Content $proj.PSPath
+    (Get-Content $proj.PSPath) -replace 'RuntimeLibrary>MultiThreadedDLL', 'RuntimeLibrary>MultiThreaded' |
+    Set-Content $proj.PSPath
+    (Get-Content $proj.PSPath) -replace 'U_ICU_IMPLEMENTATION', 'U_STATIC_IMPLEMENTATION' |
+    Set-Content $proj.PSPath
+}
+
 
 # Get number of processors for parallel build
 $numProcs = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
