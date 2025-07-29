@@ -242,7 +242,12 @@ try {
     
     # Build the solution
     Write-Status "Running MSBuild..."
-    $buildOutput = & $msbuildPath "allinone.sln" "/p:Configuration=Release" "/p:Platform=x64" "/maxcpucount:$numProcs" 2>&1
+    $buildOutput = & $msbuildPath "allinone.sln" `
+        "/p:Configuration=Release"        `
+        "/p:Platform=x64"                 `
+        "/p:RuntimeLibrary=MultiThreaded" `
+        "/p:ICU_ENABLE_STATIC=1"          `
+        "/maxcpucount:$numProcs"
     Write-Status "MSBuild completed"
     Add-Content -Path $BUILD_LOG -Value $buildOutput
     
